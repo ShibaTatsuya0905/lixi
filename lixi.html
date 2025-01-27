@@ -142,7 +142,7 @@
   <body>
     <div class="container">
       <h1>Game Rút Lì Xì</h1>
-      <p>Nhấn vào bao lì xì để rút tiền!</p>
+      <p>Nhấn vào bao lì xì để rút xiềnnnnnnnn!</p>
 
       <div class="red-envelope" onclick="drawLiXi()">
         <div class="money" id="money"></div>
@@ -165,7 +165,7 @@
       function drawLiXi() {
         if (remainingAttempts <= 0) {
           document.getElementById("message").innerText =
-            "Bạn đã hết lượt rút lì xì!";
+            "Embe đã hết lượt rút lì xì!";
           return;
         }
 
@@ -185,12 +185,12 @@
         messageDiv.classList.remove("big-win");
 
         if (amount === 500000) {
-          messageDiv.innerHTML = `Chúc mừng bạn nhận được ${amount.toLocaleString(
+          messageDiv.innerHTML = `Chúc mừng Embe nhận được ${amount.toLocaleString(
             "vi-VN"
           )}đ! 🎉`;
           messageDiv.classList.add("big-win");
         } else {
-          messageDiv.innerText = `Bạn vừa nhận được ${amount.toLocaleString(
+          messageDiv.innerText = `Embe vừa nhận được ${amount.toLocaleString(
             "vi-VN"
           )}đ! Còn ${--remainingAttempts} lượt.`;
         }
@@ -199,7 +199,7 @@
         const log = document.getElementById("log");
         const logItem = document.createElement("div");
         logItem.className = "log-item";
-        logItem.innerText = `Bạn nhận được ${amount.toLocaleString("vi-VN")}đ`;
+        logItem.innerText = `Embe nhận được ${amount.toLocaleString("vi-VN")}đ`;
         log.appendChild(logItem);
       }
     </script>
