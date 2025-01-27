@@ -10,20 +10,22 @@
         text-align: center;
         margin: 0;
         padding: 20px;
-        background-color: #f9f9f9;
+        background-color: #fce4ec;
+        overflow-x: hidden;
       }
 
       .container {
         max-width: 500px;
         margin: 20px auto;
         padding: 20px;
-        background: white;
+        background: yellow;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         border-radius: 10px;
+        position: relative;
       }
 
       h1 {
-        color: #ff4500;
+        color: #d50000;
       }
 
       .red-envelope {
@@ -137,12 +139,130 @@
         margin: 5px 0;
         border-radius: 5px;
       }
+
+      /* Tết effects */
+      .firework {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background-color: gold;
+        border-radius: 50%;
+        opacity: 0.8;
+        pointer-events: none;
+      }
+
+      .firework.falling {
+        animation: falling-firework 3s linear;
+      }
+
+      .firework.animate {
+        animation: burst-firework 1.5s ease-out forwards;
+      }
+
+      @keyframes falling-firework {
+        0% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(100vh);
+          opacity: 0;
+        }
+      }
+
+      @keyframes burst-firework {
+        0% {
+          transform: translate(-50%, -50%) scale(0);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y)))
+            scale(1);
+          opacity: 0;
+        }
+      }
+
+      .sparkler {
+        position: fixed;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        pointer-events: none;
+        opacity: 0.7;
+        animation: move-sparkler 2s linear infinite;
+      }
+
+      @keyframes move-sparkler {
+        0% {
+          transform: translate(0, 0);
+        }
+        100% {
+          transform: translate(var(--dx), var(--dy));
+          opacity: 0;
+        }
+      }
+
+      .lantern {
+        position: absolute;
+        width: 80px;
+        height: 100px;
+        background: red;
+        border-radius: 0 0 40px 40px;
+        top: -50px;
+        animation: float 4s infinite ease-in-out;
+      }
+
+      .lantern:before {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 10px;
+        height: 10px;
+        background: gold;
+        border-radius: 50%;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      .dragon {
+        position: fixed;
+        top: 20%;
+        left: -200px;
+        font-size: 50px;
+        line-height: 1;
+        animation: dragon-fly 10s infinite linear;
+      }
+
+      @keyframes dragon-fly {
+        0% {
+          left: -200px;
+          transform: scaleX(1);
+        }
+        50% {
+          left: 110%;
+          transform: scaleX(1);
+        }
+        100% {
+          left: -200px;
+          transform: scaleX(-1);
+        }
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <h1>Game Rút Lì Xì</h1>
-      <p>Nhấn vào bao lì xì để rút xiềnnnnnnnn!</p>
+      <p>Nhấn vào bao lì xì để rút tiền!</p>
 
       <div class="red-envelope" onclick="drawLiXi()">
         <div class="money" id="money"></div>
@@ -152,14 +272,97 @@
       <div class="log" id="log"></div>
     </div>
 
+    <!-- Lantern Decorations -->
+    <div class="lantern" style="left: 10%"></div>
+    <div class="lantern" style="left: 30%"></div>
+    <div class="lantern" style="left: 70%"></div>
+    <div class="lantern" style="left: 90%"></div>
+
+    <!-- Dragon Animation -->
+    <span class="dragon">🐉</span>
+
     <script>
       let remainingAttempts = 10;
+      const colors = ["gold", "orange", "red", "yellow", "white"];
 
       function randomLiXi() {
         const random = Math.random() * 100;
-        if (random <= 75) return 100000; // 88% cho 100k
-        if (random <= 75 + 20) return 200000; // 8% cho 200k
-        return 500000; // 4% cho 500k
+        if (random <= 75) return 100000;
+        if (random <= 75 + 20) return 200000;
+        return 500000;
+      }
+
+      function createFirework(x, y) {
+        const firework = document.createElement("div");
+        firework.classList.add("firework");
+        firework.style.left = `${x}px`;
+        firework.style.top = `${y}px`;
+        let randomX = (Math.random() - 0.5) * 150;
+        let randomY = (Math.random() - 0.5) * 150;
+        firework.style.setProperty("--x", `${randomX}px`);
+        firework.style.setProperty("--y", `${randomY}px`);
+        document.body.appendChild(firework);
+
+        firework.classList.add("animate");
+
+        setTimeout(() => {
+          firework.remove();
+        }, 1600);
+      }
+
+      function createMultipleFireworks(x, y, count) {
+        for (let i = 0; i < count; i++) {
+          createFirework(x, y);
+        }
+      }
+
+      function createFallingFirework() {
+        const firework = document.createElement("div");
+        firework.classList.add("firework", "falling");
+        firework.style.left = `${Math.random() * window.innerWidth}px`;
+        firework.style.top = `${-20 + Math.random() * 100}px`;
+
+        document.body.appendChild(firework);
+
+        setTimeout(() => {
+          firework.remove();
+        }, 3000);
+      }
+
+      function createSparkler() {
+        const sparkler = document.createElement("div");
+        sparkler.classList.add("sparkler");
+
+        // random vị trí ban đầu
+        let randomX = Math.random() * window.innerWidth;
+        let randomY = Math.random() * window.innerHeight;
+        sparkler.style.left = `${randomX}px`;
+        sparkler.style.top = `${randomY}px`;
+
+        // Random màu sắc
+        sparkler.style.backgroundColor =
+          colors[Math.floor(Math.random() * colors.length)];
+
+        // random hướng di chuyển
+        let randomDX = (Math.random() - 0.5) * 200;
+        let randomDY = (Math.random() - 0.5) * 200;
+        sparkler.style.setProperty("--dx", `${randomDX}px`);
+        sparkler.style.setProperty("--dy", `${randomDY}px`);
+
+        document.body.appendChild(sparkler);
+        setTimeout(() => sparkler.remove(), 2000); // remove after animation
+      }
+      // Function to create multiple falling fireworks
+      function startFallingFireworks(count) {
+        for (let i = 0; i < count; i++) {
+          setTimeout(createFallingFirework, i * 100);
+        }
+      }
+
+      function startSparklers(count) {
+        for (let i = 0; i < count; i++) {
+          setTimeout(createSparkler, i * 50);
+        }
       }
 
       function drawLiXi() {
@@ -174,13 +377,11 @@
         moneyDiv.innerText = `${amount.toLocaleString("vi-VN")}đ`;
         moneyDiv.style.display = "block";
 
-        // Hiệu ứng hiện tiền
         moneyDiv.classList.add("animate");
         setTimeout(() => {
           moneyDiv.style.display = "none";
         }, 1500);
 
-        // Hiệu ứng chúc mừng đặc biệt
         const messageDiv = document.getElementById("message");
         messageDiv.classList.remove("big-win");
 
@@ -189,19 +390,33 @@
             "vi-VN"
           )}đ! 🎉`;
           messageDiv.classList.add("big-win");
+          const rect = document
+            .querySelector(".red-envelope")
+            .getBoundingClientRect();
+          createMultipleFireworks(
+            rect.left + rect.width / 2,
+            rect.top + rect.height / 2,
+            25
+          );
         } else {
           messageDiv.innerText = `Embe vừa nhận được ${amount.toLocaleString(
             "vi-VN"
           )}đ! Còn ${--remainingAttempts} lượt.`;
         }
 
-        // Cập nhật lịch sử
         const log = document.getElementById("log");
         const logItem = document.createElement("div");
         logItem.className = "log-item";
         logItem.innerText = `Embe nhận được ${amount.toLocaleString("vi-VN")}đ`;
         log.appendChild(logItem);
       }
+
+      // Start the falling fireworks initially and every few seconds
+      startFallingFireworks(10);
+      setInterval(() => startFallingFireworks(5), 5000);
+
+      startSparklers(20); // Create sparklers initially
+      setInterval(() => startSparklers(10), 2000); // create sparklers every 2 seconds
     </script>
   </body>
 </html>
