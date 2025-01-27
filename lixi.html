@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lì xì Random</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 0;
+        padding: 20px;
+        background-color: #f9f9f9;
+      }
+
+      .container {
+        max-width: 500px;
+        margin: 20px auto;
+        padding: 20px;
+        background: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+      }
+
+      h1 {
+        color: #ff4500;
+      }
+
+      .red-envelope {
+        display: inline-block;
+        width: 150px;
+        height: 200px;
+        background: red;
+        border-radius: 10px;
+        position: relative;
+        cursor: pointer;
+        margin: 20px 0;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+      }
+
+      .red-envelope:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s;
+      }
+
+      .red-envelope::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50px;
+        background: #ff6347;
+        clip-path: polygon(0 0, 100% 0, 50% 100%);
+      }
+
+      .money {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        width: 100px;
+        height: 50px;
+        background: yellow;
+        color: black;
+        font-weight: bold;
+        font-size: 18px;
+        line-height: 50px;
+        text-align: center;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        animation: pop-out 0.5s forwards;
+      }
+
+      @keyframes pop-out {
+        0% {
+          transform: translate(-50%, -50%) scale(0);
+          opacity: 0;
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 1;
+        }
+      }
+
+      .message {
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        position: relative;
+        display: inline-block;
+        padding: 10px;
+        border-radius: 5px;
+        animation: fade-in 0.5s;
+      }
+
+      .message.big-win {
+        background: linear-gradient(to right, gold, orange);
+        color: white;
+        box-shadow: 0 0 20px gold;
+        animation: sparkle 1.5s infinite;
+      }
+
+      @keyframes sparkle {
+        0% {
+          text-shadow: 0 0 10px gold, 0 0 20px orange, 0 0 30px red;
+        }
+        50% {
+          text-shadow: 0 0 20px gold, 0 0 40px orange, 0 0 50px red;
+        }
+        100% {
+          text-shadow: 0 0 10px gold, 0 0 20px orange, 0 0 30px red;
+        }
+      }
+
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .log {
+        margin-top: 20px;
+        text-align: left;
+        font-size: 14px;
+      }
+
+      .log-item {
+        background: #f1f1f1;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Game Rút Lì Xì</h1>
+      <p>Nhấn vào bao lì xì để rút tiền!</p>
+
+      <div class="red-envelope" onclick="drawLiXi()">
+        <div class="money" id="money"></div>
+      </div>
+
+      <div class="message" id="message">Chúc bạn may mắn!</div>
+      <div class="log" id="log"></div>
+    </div>
+
+    <script>
+      let remainingAttempts = 10;
+
+      function randomLiXi() {
+        const random = Math.random() * 100;
+        if (random <= 75) return 100000; // 88% cho 100k
+        if (random <= 75 + 20) return 200000; // 8% cho 200k
+        return 500000; // 4% cho 500k
+      }
+
+      function drawLiXi() {
+        if (remainingAttempts <= 0) {
+          document.getElementById("message").innerText =
+            "Bạn đã hết lượt rút lì xì!";
+          return;
+        }
+
+        const amount = randomLiXi();
+        const moneyDiv = document.getElementById("money");
+        moneyDiv.innerText = `${amount.toLocaleString("vi-VN")}đ`;
+        moneyDiv.style.display = "block";
+
+        // Hiệu ứng hiện tiền
+        moneyDiv.classList.add("animate");
+        setTimeout(() => {
+          moneyDiv.style.display = "none";
+        }, 1500);
+
+        // Hiệu ứng chúc mừng đặc biệt
+        const messageDiv = document.getElementById("message");
+        messageDiv.classList.remove("big-win");
+
+        if (amount === 500000) {
+          messageDiv.innerHTML = `Chúc mừng bạn nhận được ${amount.toLocaleString(
+            "vi-VN"
+          )}đ! 🎉`;
+          messageDiv.classList.add("big-win");
+        } else {
+          messageDiv.innerText = `Bạn vừa nhận được ${amount.toLocaleString(
+            "vi-VN"
+          )}đ! Còn ${--remainingAttempts} lượt.`;
+        }
+
+        // Cập nhật lịch sử
+        const log = document.getElementById("log");
+        const logItem = document.createElement("div");
+        logItem.className = "log-item";
+        logItem.innerText = `Bạn nhận được ${amount.toLocaleString("vi-VN")}đ`;
+        log.appendChild(logItem);
+      }
+    </script>
+  </body>
+</html>
