@@ -12,6 +12,8 @@
         padding: 20px;
         background-color: #fce4ec;
         overflow-x: hidden;
+        position: relative;
+        min-height: 100vh; /* Ensure body covers full viewport height */
       }
 
       .container {
@@ -257,6 +259,17 @@
           transform: scaleX(-1);
         }
       }
+
+      /* Snake styles */
+      #snake-svg {
+        position: fixed; /* Fixed position relative to the viewport */
+        bottom: 0; /* Align to the bottom of the viewport */
+        left: 50%; /* Align the middle of the snake to middle of screen*/
+        transform: translateX(-50%); /* Center the snake horizontally */
+        display: block;
+        z-index: 99; /* Ensure snake is on top of other elements */
+      }
+      /* Ensure SVG stays behind content*/
     </style>
   </head>
   <body>
@@ -281,7 +294,127 @@
     <!-- Dragon Animation -->
     <span class="dragon">🐍</span>
 
+    <!-- Snake SVG -->
+    <svg
+      id="snake-svg"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 400 400"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <!-- Cơ thể con rắn -->
+      <path
+        id="snake-body"
+        fill="none"
+        stroke="#009900"
+        stroke-width="14"
+        d="M200,200 C180,180 160,220 140,200 C120,180 100,220 80,200"
+      />
+
+      <!-- Đầu rắn -->
+      <circle id="snake-head" cx="200" cy="200" r="20" fill="#006600" />
+
+      <!-- Mắt trái -->
+      <circle id="left-eye" cx="195" cy="195" r="2.5" fill="#000" />
+
+      <!-- Mắt phải -->
+      <circle id="right-eye" cx="205" cy="195" r="2.5" fill="#000" />
+
+      <!-- Lưỡi -->
+      <path
+        id="snake-tongue"
+        d="M200,215 L200,230 M200,230 L195,225 M200,230 L205,225"
+        stroke="#ff0000"
+        stroke-width="1.5"
+        fill="none"
+      />
+    </svg>
+
     <script>
+      // Lấy các phần tử trong SVG
+      const snakeSvg = document.getElementById("snake-svg");
+      const snakeBody = document.getElementById("snake-body");
+      const snakeHead = document.getElementById("snake-head");
+      const leftEye = document.getElementById("left-eye");
+      const rightEye = document.getElementById("right-eye");
+      const snakeTongue = document.getElementById("snake-tongue");
+
+      let angle = 0; // Góc ban đầu để tạo hiệu ứng sóng
+
+      function resizeSvg() {
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+
+        const aspectRatio = 400 / 400;
+
+        let svgWidth = screenWidth;
+        let svgHeight = screenWidth / aspectRatio;
+
+        if (svgHeight > 200) {
+          svgHeight = 200;
+          svgWidth = 200 * aspectRatio;
+        }
+
+        // Check if svgHeight is less than screenHeight
+        if (svgHeight > screenHeight) {
+          svgHeight = screenHeight;
+          svgWidth = screenHeight * aspectRatio;
+        }
+
+        snakeSvg.setAttribute("width", svgWidth);
+        snakeSvg.setAttribute("height", svgHeight);
+      }
+
+      function animateSnake() {
+        angle += 0.1; // Tăng góc để tạo chuyển động
+
+        // Tạo dữ liệu mới cho cơ thể rắn với hiệu ứng sóng
+        const bodyPath = [];
+        const totalSegments = 20; // Số lượng đoạn cơ thể
+        const bodyLength = 5; // Độ dài của từng đoạn cơ thể
+
+        for (let i = 0; i < totalSegments; i++) {
+          const offset = i * bodyLength;
+          const x = 200 + Math.sin(angle + offset / 10) * 40; // Tính tọa độ X
+          const y = 200 + Math.cos(angle + offset / 10) * 20; // Tính tọa độ Y
+          bodyPath.push(`${x},${y}`);
+        }
+
+        // Cập nhật đường đi của cơ thể rắn
+        snakeBody.setAttribute("d", `M${bodyPath.join(" L")}`);
+
+        // Di chuyển đầu rắn theo đoạn đầu của cơ thể
+        const headX = 200 + Math.sin(angle) * 40;
+        const headY = 200 + Math.cos(angle) * 20;
+        snakeHead.setAttribute("cx", headX);
+        snakeHead.setAttribute("cy", headY);
+
+        // Di chuyển mắt theo đầu rắn
+        leftEye.setAttribute("cx", headX - 5);
+        leftEye.setAttribute("cy", headY - 5);
+        rightEye.setAttribute("cx", headX + 5);
+        rightEye.setAttribute("cy", headY - 5);
+
+        // Di chuyển lưỡi theo đầu rắn
+        snakeTongue.setAttribute(
+          "d",
+          `
+        M${headX},${headY + 14} 
+        L${headX},${headY + 30} 
+        M${headX},${headY + 30} 
+        L${headX - 5},${headY + 25} 
+        M${headX},${headY + 30} 
+        L${headX + 5},${headY + 25}
+      `
+        );
+
+        // Lặp lại hoạt động
+        requestAnimationFrame(animateSnake);
+      }
+
+      resizeSvg();
+      window.addEventListener("resize", resizeSvg);
+      animateSnake(); // Bắt đầu hoạt động
+
       let remainingAttempts = 10;
       const colors = ["gold", "orange", "red", "yellow", "white"];
 
